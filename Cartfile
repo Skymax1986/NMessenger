@@ -1,1 +1,1 @@
-github "facebook/AsyncDisplayKit" "master"
+github "facebook/AsyncDisplayKit" ~> 2.2
