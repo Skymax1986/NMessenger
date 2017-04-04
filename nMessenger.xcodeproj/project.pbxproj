@@ -1135,12 +1135,10 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 6162802E1D8196F700D1F510 /* Build configuration list for PBXNativeTarget "nMessenger-iOS" */;
 			buildPhases = (
-				8A0B25557A4A5264E86877EA /* [CP] Check Pods Manifest.lock */,
 				616280201D8196F700D1F510 /* Sources */,
 				616280211D8196F700D1F510 /* Frameworks */,
 				616280221D8196F700D1F510 /* Headers */,
 				616280231D8196F700D1F510 /* Resources */,
-				22AF31E7FD2A32B559DE15C1 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -1155,12 +1153,9 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = F1418D0B1D380B2400C404B5 /* Build configuration list for PBXNativeTarget "nMessenger" */;
 			buildPhases = (
-				58CB97744A374D6D16A52ABA /* [CP] Check Pods Manifest.lock */,
 				F1418CDF1D380B2400C404B5 /* Sources */,
 				F1418CE01D380B2400C404B5 /* Frameworks */,
 				F1418CE11D380B2400C404B5 /* Resources */,
-				72DD7E364423637E2B452014 /* [CP] Embed Pods Frameworks */,
-				2490890A9DFE779CEF913BEF /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -1175,12 +1170,9 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = F1418D0E1D380B2400C404B5 /* Build configuration list for PBXNativeTarget "nMessengerTests" */;
 			buildPhases = (
-				A1EAC93D3E60EE9287D5A1A1 /* [CP] Check Pods Manifest.lock */,
 				F1418CF31D380B2400C404B5 /* Sources */,
 				F1418CF41D380B2400C404B5 /* Frameworks */,
 				F1418CF51D380B2400C404B5 /* Resources */,
-				C0C629968B1A2B229A2FC68A /* [CP] Embed Pods Frameworks */,
-				B63E1D299EF994DC6556DA08 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -1196,12 +1188,9 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = F1418D111D380B2400C404B5 /* Build configuration list for PBXNativeTarget "nMessengerUITests" */;
 			buildPhases = (
-				D85CE90B54825D807BA9D883 /* [CP] Check Pods Manifest.lock */,
 				F1418CFE1D380B2400C404B5 /* Sources */,
 				F1418CFF1D380B2400C404B5 /* Frameworks */,
 				F1418D001D380B2400C404B5 /* Resources */,
-				F7B47B6A4B98158750DAB112 /* [CP] Embed Pods Frameworks */,
-				92EE1EB1707ECEA825593FBA /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -1563,174 +1552,6 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
-
-/* Begin PBXShellScriptBuildPhase section */
-		22AF31E7FD2A32B559DE15C1 /* [CP] Copy Pods Resources */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-			);
-			name = "[CP] Copy Pods Resources";
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-nMessenger-iOS/Pods-nMessenger-iOS-resources.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
-		2490890A9DFE779CEF913BEF /* [CP] Copy Pods Resources */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-			);
-			name = "[CP] Copy Pods Resources";
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-nMessenger/Pods-nMessenger-resources.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
-		58CB97744A374D6D16A52ABA /* [CP] Check Pods Manifest.lock */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-			);
-			name = "[CP] Check Pods Manifest.lock";
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "diff \"${PODS_ROOT}/../Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n";
-			showEnvVarsInLog = 0;
-		};
-		72DD7E364423637E2B452014 /* [CP] Embed Pods Frameworks */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-			);
-			name = "[CP] Embed Pods Frameworks";
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-nMessenger/Pods-nMessenger-frameworks.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
-		8A0B25557A4A5264E86877EA /* [CP] Check Pods Manifest.lock */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-			);
-			name = "[CP] Check Pods Manifest.lock";
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "diff \"${PODS_ROOT}/../Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n";
-			showEnvVarsInLog = 0;
-		};
-		92EE1EB1707ECEA825593FBA /* [CP] Copy Pods Resources */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-			);
-			name = "[CP] Copy Pods Resources";
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-nMessengerUITests/Pods-nMessengerUITests-resources.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
-		A1EAC93D3E60EE9287D5A1A1 /* [CP] Check Pods Manifest.lock */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-			);
-			name = "[CP] Check Pods Manifest.lock";
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "diff \"${PODS_ROOT}/../Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n";
-			showEnvVarsInLog = 0;
-		};
-		B63E1D299EF994DC6556DA08 /* [CP] Copy Pods Resources */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-			);
-			name = "[CP] Copy Pods Resources";
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-nMessengerTests/Pods-nMessengerTests-resources.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
-		C0C629968B1A2B229A2FC68A /* [CP] Embed Pods Frameworks */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-			);
-			name = "[CP] Embed Pods Frameworks";
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-nMessengerTests/Pods-nMessengerTests-frameworks.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
-		D85CE90B54825D807BA9D883 /* [CP] Check Pods Manifest.lock */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-			);
-			name = "[CP] Check Pods Manifest.lock";
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "diff \"${PODS_ROOT}/../Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n";
-			showEnvVarsInLog = 0;
-		};
-		F7B47B6A4B98158750DAB112 /* [CP] Embed Pods Frameworks */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-			);
-			name = "[CP] Embed Pods Frameworks";
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-nMessengerUITests/Pods-nMessengerUITests-frameworks.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
-/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		616280201D8196F700D1F510 /* Sources */ = {
