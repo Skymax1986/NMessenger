@@ -109,12 +109,6 @@ open class NMessengerViewController: UIViewController
         self.addObservers()
     }
     
-    open func onAssetsPicked(_ assets: [PHAsset])
-    {
-        print("[WARN] NMessengerViewController.onAssetsPicked() is invoked but not overloaded")
-        print("Assets : \(assets.debugDescription)")
-    }
-    
     open func onImagesPicked(_ images: [UIImage])
     {
         // legacy implementation
