@@ -26,7 +26,6 @@ open class NMessengerBarView: InputBarView
     @IBOutlet open weak var inputBarView: UIView!
     
     @IBOutlet open weak var photoPickerButton: UIButton!
-    @IBOutlet open weak var badgeLabel: UILabel?
     
     //@IBOutlet for send button
     @IBOutlet open weak var sendButton: UIButton!
@@ -38,7 +37,6 @@ open class NMessengerBarView: InputBarView
     @IBOutlet open weak var textInputViewTopMargin   : NSLayoutConstraint?
     @IBOutlet open weak var textInputViewBottomMargin: NSLayoutConstraint?
     
-    @IBOutlet weak var symbolsCounterLabel: UILabel?
     
     //MARK: Public Parameters
     //Reference to CameraViewController
@@ -51,10 +49,7 @@ open class NMessengerBarView: InputBarView
     
     
     //CGFloat to the fine the number of rows a user can type
-    open var numberOfRows: CGFloat = 3
-    open var maxSymolsCountInMessage: Int? = nil
-    open var minSymbolsToShowCounter: Int? = nil
-    
+    open var numberOfRows:CGFloat = 3
     //String as placeholder text in input view
     open var inputTextViewPlaceholder: String =
         Bundle.main.localizedString(forKey: "Chat.InputField.PlaceholderText",
@@ -150,7 +145,7 @@ open class NMessengerBarView: InputBarView
         textInputView.delegate            = self
         self.sendButton.isEnabled         = false
         self.cameraVcProto.cameraDelegate = self
-        self.symbolsCounterLabel?.isHidden = true
+
     }
     
     //MARK: TextView delegate methods
@@ -192,37 +187,84 @@ open class NMessengerBarView: InputBarView
         self.textInputView.resignFirstResponder()
         return true
     }
-    
-    
-    private func updateSendButton() {
+    /**
+     Implementing shouldChangeTextInRange in order to remove placeholder when user starts typing and to show send button
+     Re-sizing the text area to default values when the return button is tapped
+     Limit the amount of rows a user can write to the value of numberOfRows
+    */
+    open func textView(_ textView: UITextView,
+         shouldChangeTextIn range: NSRange   ,
+             replacementText text: String    )
+    -> Bool
+    {
+        let isEmptyText = (textView.text == "")
+        let isNewLineReplacementText = (text == "\n")
         
-        var sendingAllowed = true
         
-        let text = self.textInputView.text
-        
-        if text == nil || text!.isEmpty {
-            sendingAllowed = false
-            
-        } else {
-        
-            if let maxSymolsCountInMessage = self.maxSymolsCountInMessage {
+        if (isEmptyText && !isNewLineReplacementText)
+        {
+            UIView.animate(withDuration: 0.1)
+            {
+                self.sendButton.isEnabled = true
+            }
+            return true
+        }
+        else if isNewLineReplacementText && !isEmptyText
+        {
+            if textView == self.textInputView
+            {
+                self.doSend()
                 
-                sendingAllowed = text!.characters.count <= maxSymolsCountInMessage
+                return false
             }
         }
-        
-        UIView.animate(withDuration: 0.1) {
+        else if (!isNewLineReplacementText)
+        {
+            let castedText: NSString = textView.text as NSString
+            let newText = castedText.replacingCharacters(in: range, with: text)
             
-            self.sendButton.isEnabled = sendingAllowed
+            let numberOfLines = self.getNumberOfLines(forText: newText,
+                                                   inTextView: textView)
+            
+            return numberOfLines <= self.numberOfRows
         }
+        return false
     }
     
     private func getNumberOfLines(forText newText: String,
                               inTextView textView: UITextView) -> CGFloat
     {
-        let textSize = size(of: newText, in: textView)
+        let textViewInsets =
+            UIEdgeInsetsInsetRect(
+                textView.frame,
+                textView.textContainerInset)
         
-        let numberOfLines = textSize.height / textView.font!.lineHeight
+        let textWidth: CGFloat =
+            textViewInsets.width
+                - 2.0 * textView.textContainer.lineFragmentPadding
+        
+        
+        let options: NSStringDrawingOptions =
+        [
+            NSStringDrawingOptions.usesLineFragmentOrigin,
+            NSStringDrawingOptions.usesFontLeading
+        ]
+        
+        let attributes: [String : Any] =
+        [
+            NSFontAttributeName: textView.font!
+        ]
+        
+        
+        let textBounds = CGSize(width: textWidth, height: 0)
+        let boundingRect: CGRect =
+            newText.boundingRect(
+                   with: textBounds,
+                options: options,
+             attributes: attributes,
+                context: nil)
+        
+        let numberOfLines = boundingRect.height / textView.font!.lineHeight;
 
         return numberOfLines
     }
@@ -242,83 +284,27 @@ open class NMessengerBarView: InputBarView
         return result
     }
     
-    private func size(of text: String, in textView: UITextView) -> CGSize {
-        
-        let textViewInsets = UIEdgeInsetsInsetRect(textView.frame,
-                                                   textView.textContainerInset)
-        
-        let textWidth: CGFloat = textViewInsets.width
-            - 2.0 * textView.textContainer.lineFragmentPadding
-        
-        
-        let options: NSStringDrawingOptions = [.usesLineFragmentOrigin,
-                                               .usesFontLeading]
-        
-        let attributes: [String: Any] = [NSFontAttributeName: textView.font!]
-        
-        
-        let textBounds = CGSize(width: textWidth, height: 0)
-        let boundingRect: CGRect = text.boundingRect(with: textBounds,
-                                                     options: options,
-                                                     attributes: attributes,
-                                                     context: nil)
-        
-        return CGSize(width: ceil(boundingRect.width),
-                      height: ceil(boundingRect.height))
-    }
-    
-    private func containerSize(for textSize: CGSize, in textView: UITextView) -> CGSize {
-        let width = textSize.width
-            + textView.textContainerInset.left
-            + textView.textContainerInset.right
-        
-        let height = textSize.height
-            + textView.textContainerInset.top
-            + textView.textContainerInset.bottom
-
-        return CGSize(width: width, height: height)
-    }
-    
     /**
      Implementing textViewDidChange in order to resize the text input area
      */
     open func textViewDidChange(_ textView: UITextView)
     {
         let fixedWidth = textView.frame.size.width
-        
-        var textSize = self.size(of: textView.text, in: textView)
-        
-        textSize.height = min(textSize.height, self.numberOfRows * textView.font!.lineHeight)
-        
-        let newSize = self.containerSize(for: textSize, in: textView)
+    
+        let rawNewSize = CGSize(width: fixedWidth, height: CGFloat.greatestFiniteMagnitude)
+        let newSize = textView.sizeThatFits(rawNewSize)
         
         var newFrame = textView.frame
-        let newFrameWidth  = max(newSize.width, fixedWidth)
+        let newFrameWidth  = max(newSize.width , fixedWidth)
         let newFrameHeight = max(newSize.height, self.textInputViewHeightConst)
-        
         newFrame.size = CGSize(width: newFrameWidth,
-                               height: newFrameHeight)
+                              height: newFrameHeight)
         
         let textViewMarginsHeight = self.topAndBottomMarginsForTextView()
         self.textInputViewHeight.constant = newFrame.size.height
-        self.textInputAreaViewHeight.constant = newFrame.size.height + textViewMarginsHeight
-        
-        let symbolsCount = textView.text.characters.count
-        
-        if
-            let maxSymbols = self.maxSymolsCountInMessage,
-            let minSymbols = self.minSymbolsToShowCounter,
-            let counterLabel = self.symbolsCounterLabel
-        {
-            counterLabel.text = "\(symbolsCount)/\n\(maxSymbols)"
-            counterLabel.isHidden = symbolsCount < minSymbols
-            counterLabel.textColor = symbolsCount <= maxSymbols ? UIColor.gray : UIColor.red
-        }
-        
-        self.setNeedsLayout()
-        self.layoutIfNeeded()
-        
-        self.updateSendButton()
+        self.textInputAreaViewHeight.constant =
+            newFrame.size.height
+          + textViewMarginsHeight
     }
     
     //MARK: TextView helper methods
@@ -381,81 +367,96 @@ open class NMessengerBarView: InputBarView
      */
     @IBAction open func plusClicked(_ sender: AnyObject?)
     {
-        self.checkCameraPermissions { [weak self] cameraPermissionsGranted in
-            
-            self?.checkPhotoLibraryPermissions { [weak self] photoLibraryPermissionsGranted in
+        let authStatus = self.cameraVcProto.cameraAuthStatus
+        let photoLibAuthStatus = self.cameraVcProto.photoLibAuthStatus
+        if(authStatus != AVAuthorizationStatus.authorized)
+        {
+            self.cameraVcProto.isCameraPermissionGranted(
+            {
+                (granted) in
                 
-                self?.showPickerView(executeAfterTransition: { [weak self] in
+                if(granted)
+                {
+                    self.cameraVcProto.cameraAuthStatus =
+                        AVCaptureDevice.authorizationStatus(forMediaType: AVMediaTypeVideo)
                     
-                    guard let strongSelf = self else {
-                        return
+                    DispatchQueue.main.async
+                    {
+                        self.controller.present( self.cameraVC,
+                                       animated: true,
+                                     completion: nil)
                     }
+                }
+                else
+                {
+                    self.cameraVcProto.cameraAuthStatus =
+                        AVCaptureDevice.authorizationStatus(forMediaType: AVMediaTypeVideo)
                     
-                    // FIXME: Application crashes if camera permissions were not granted
-                    switch (cameraPermissionsGranted, photoLibraryPermissionsGranted) {
-                        
-                    case (true, true):
-                        break
-                        
-                    case (false, true):
-                        
-                        ModalAlertUtilities
-                            .postGoToSettingToEnableCameraModal(fromController: strongSelf.cameraVC)
-                        
-                    case (true, false):
-                        
-                        ModalAlertUtilities
-                            .postGoToSettingToEnableLibraryModal(fromController: strongSelf.cameraVC)
-                        
-                    case (false, false):
-                        
-                        ModalAlertUtilities
-                            .postGoToSettingToEnableCameraAndLibraryModal(fromController: strongSelf.cameraVC)
+                    if(photoLibAuthStatus != PHAuthorizationStatus.authorized)
+                    {
+                        self.cameraVcProto.requestPhotoLibraryPermissions
+                        {
+                            (granted) in
+                            
+                            if(granted)
+                            {
+                                self.cameraVcProto.photoLibAuthStatus =
+                                    PHPhotoLibrary.authorizationStatus()
+                                
+                                DispatchQueue.main.async
+                                {
+                                    self.controller.present( self.cameraVC,
+                                                   animated: true)
+                                    {
+                                        ModalAlertUtilities.postGoToSettingToEnableCameraModal(fromController: self.cameraVC)
+                                    }
+                                }
+                                
+                            }
+                            else
+                            {
+                                self.cameraVcProto.photoLibAuthStatus =
+                                    PHPhotoLibrary.authorizationStatus()
+                                
+                                ModalAlertUtilities.postGoToSettingToEnableCameraAndLibraryModal(fromController: self.controller)
+                            }
+                        }
                     }
-                })
+                    else
+                    {
+                        DispatchQueue.main.async
+                        {
+                            self.controller.present( self.cameraVC,
+                                           animated: true,
+                                         completion: nil)
+                        }
+                    }
+                }
+            })
+        }
+        else
+        {//also check if photo gallery permissions are granted
+            self.cameraVcProto.cameraAuthStatus =
+                AVCaptureDevice.authorizationStatus(forMediaType: AVMediaTypeVideo)
+            
+            DispatchQueue.main.async
+            {
+                self.controller.present( self.cameraVC,
+                               animated: true,
+                             completion: nil)
             }
         }
     }
     
-    private func checkCameraPermissions(_ completion: @escaping (Bool) -> Void) {
-        
-        let authStatus = self.cameraVcProto.cameraAuthStatus
-
-        if authStatus != AVAuthorizationStatus.authorized {
-            
-            self.cameraVcProto.isCameraPermissionGranted(completion)
-            
-        } else {
-            
-            completion(true)
-        }
-    }
-    
-    private func checkPhotoLibraryPermissions(_ completion: @escaping (Bool) -> Void) {
-        
-        let photoLibAuthStatus = self.cameraVcProto.photoLibAuthStatus
-        
-        if photoLibAuthStatus != PHAuthorizationStatus.authorized {
-            
-            self.cameraVcProto.requestPhotoLibraryPermissions(completion)
-            
-        } else {
-            
-            completion(true)
-        }
-    }
     
     //MARK: CameraView delegate methods
-    //
-    //
-    
     /**
      Implemetning CameraView delegate method
      Close the CameraView and sends the image to the controller
      */
     open func pickedImages(_ images: [UIImage])
     {
-        self.hidePickerView()
+        self.cameraVC.dismiss(animated: true, completion: nil)
         
         self.controller.onImagesPicked(images)
         
@@ -464,110 +465,14 @@ open class NMessengerBarView: InputBarView
 //            _ = self.controller.sendImage($0, isIncomingMessage: false)
 //        }
     }
-    
-    
-    private typealias ShowPickerViewCompletion = () -> Swift.Void
-    private func showPickerView(
-        executeAfterTransition callback: ShowPickerViewCompletion?)
-    {
-        DispatchQueue.main.async
-        {
-            self.doShowPickerView(executeAfterTransition: callback)
-        }
-    }
-    
-    private func doShowPickerView(
-        executeAfterTransition callback: ShowPickerViewCompletion?)
-    {
-        if (self.isPickerCameraVc())
-        {
-            // legacy behaviour
-            //
-            self.controller.present( self.cameraVC,
-                           animated: true,
-                         completion: callback)
-        }
-        else if let navBar = self.controller.navigationController
-        {
-            navBar.pushViewController(self.cameraVC, animated: true)
-            
-            if let callbackUnwrap = callback
-            {
-                DispatchQueue.main.async
-                {
-                    // a hack to let the transition complete
-                    callbackUnwrap()
-                }
-            }
-        }
-        else
-        {
-            // legacy behaviour
-            //
-            self.controller.present( self.cameraVC,
-                                     animated: true,
-                                     completion: callback)
-        }
-    }
-    
-    private func hidePickerView()
-    {
-        DispatchQueue.main.async
-        {
-            self.doHidePickerView()
-        }
-    }
-    
-    private func doHidePickerView()
-    {
-        if (self.isPickerCameraVc())
-        {
-            // legacy behaviour
-            //
-            self.cameraVC.dismiss(animated: true, completion: nil)
-        }
-        else if let navBar = self.controller.navigationController
-        {
-            navBar.popViewController(animated: true)
-        }
-        else
-        {
-            self.cameraVC.dismiss(animated: true, completion: nil)
-        }
-    }
-    
-    
-    private func isPickerCameraVc() -> Bool
-    {
-        if let _ = self.cameraVC as? UIImagePickerController
-        {
-           return true
-        }
-    
-        return false
-    }
-    
     /**
      Implemetning CameraView delegate method
      Close the CameraView
      */
     open func cameraCancelSelection()
     {
-        self.hidePickerView()
+        cameraVC.dismiss(animated: true,
+                       completion: nil)
     }
 
-    /**
-     Should define behavior when a photo is selected.
-     Is called together with `pickedImages()`.
-     
-     Provides low level details and metadata to use with business logic.
-     */
-    public func pickedImageAssets(_ assets: [PHAsset])
-    {
-        // IDLE - this will be done in `self.pickedImages()`
-        //
-        // self.hidePickerView()
-        
-        self.controller.onAssetsPicked(assets)
-    }
 }

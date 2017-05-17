@@ -9,8 +9,6 @@
 //
 
 import Foundation
-
-import UIKit
 import Photos
 import AVFoundation
 
@@ -521,8 +519,45 @@ open class CameraViewController: UIImagePickerController
     open func imagePickerController(_ picker: UIImagePickerController,
           didFinishPickingMediaWithInfo info: [String : Any])
     {
-        let myImage:UIImage? =
-            PickedImageHelper.getImageFromPicker(self, completionOptions: info)
+        var myImage:UIImage? = nil
+        
+        if let tmpImage = info[UIImagePickerControllerEditedImage] as? UIImage
+        {
+            myImage = tmpImage
+        }
+        else
+        {
+            print("[NMEssenger] CameraViewController : Something went wrong - UIImagePickerControllerEditedImage")
+        }
+        
+        if myImage == nil
+        {
+            if let tmpImage = info[UIImagePickerControllerOriginalImage] as? UIImage
+            {
+                myImage = tmpImage
+            }
+            else
+            {
+                print("[NMEssenger] CameraViewController : Something went wrong - UIImagePickerControllerOriginalImage")
+            }
+            
+            //myImage = info[UIImagePickerControllerOriginalImage] as? UIImage
+            /* Correctly flip the mirrored image of front-facing camera */
+            
+            let isFrontSideCameraUsed =
+                (self.cameraDevice == UIImagePickerControllerCameraDevice.front)
+            if (isFrontSideCameraUsed)
+            {
+                if let im = myImage,
+                   let cgImage = im.cgImage
+                {
+                    myImage =
+                        UIImage(cgImage: cgImage,
+                                  scale: im.scale,
+                            orientation: .leftMirrored)
+                }
+            }
+        }
         
         if let myImageExisting = myImage
         {
@@ -687,18 +722,7 @@ open class CameraViewController: UIImagePickerController
     open func isCameraPermissionGranted(
         _ completion:@escaping CameraPermissionCallback)
     {
-        let callbackHook: CameraPermissionCallback =
-        {
-            [weak weakSelf = self]
-            (granted) in
-            
-            weakSelf?.cameraAuthStatus =
-                AVCaptureDevice.authorizationStatus(forMediaType: AVMediaTypeVideo)
-            
-            completion(granted)
-        }
-        
-        self.requestAccessForCamera(callbackHook)
+        self.requestAccessForCamera(completion)
     }
     /**
      Requests access for the camera and calls completion block
@@ -721,11 +745,7 @@ open class CameraViewController: UIImagePickerController
     {
         PHPhotoLibrary.requestAuthorization
         {
-            [weak weakSelf = self]
             status in
-     
-            weakSelf?.photoLibAuthStatus =
-                PHPhotoLibrary.authorizationStatus()
             
             switch status
             {
