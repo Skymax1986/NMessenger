@@ -15,8 +15,8 @@ import UIKit
  InputBarView class for NMessenger.
  Define the input bar for NMessenger. This is where the user would type text and open the camera or photo library.
  */
-open class InputBarView: UIView, InputBarViewProtocol {
-    
+open class InputBarView: UIView, InputBarViewProtocol
+{    
     //MARK: IBOutlets
     //@IBOutlets for input area view
     @IBOutlet open weak var textInputAreaView: UIView!
@@ -37,7 +37,7 @@ open class InputBarView: UIView, InputBarViewProtocol {
      */
     public required init()
     {
-        super.init(frame: CGRect(x: 0, y: 0, width: 0, height: 0))
+        super.init(frame: CGRect.zero)
     }
     
     public required init(controller:NMessengerViewController) {

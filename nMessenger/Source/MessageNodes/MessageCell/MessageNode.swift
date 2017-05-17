@@ -17,6 +17,33 @@ import AsyncDisplayKit
  */
 open class MessageNode: GeneralMessengerCell {
     
+    public enum AvatarPosition
+    {
+        case top
+        case bottom
+        
+        internal func mapToStackLayoutAlignment() -> ASStackLayoutAlignItems
+        {
+            switch self
+            {
+            case .top:
+                return .start
+                
+            case .bottom:
+                return .end
+            }
+        }
+    }
+    
+    open var avatarPosition: AvatarPosition = .top // relevant value for our app
+        // .bottom  // Legacy value of NMessenger
+    {
+        didSet
+        {
+            self.setNeedsLayout()
+        }
+    }
+    
     // MARK: Public Variables
     open weak var delegate: MessageCellProtocol?
     
@@ -52,8 +79,14 @@ open class MessageNode: GeneralMessengerCell {
     /**
      Spacing around the avatar. Defaults to UIEdgeInsetsMake(0, 0, 0, 10)
      */
-    open var avatarInsets: UIEdgeInsets = UIEdgeInsetsMake(0, 0, 0, 10) {
-        didSet {
+    open var avatarInsets: UIEdgeInsets =
+        UIEdgeInsets(top:  0,
+                    left:  0,
+                  bottom:  0,
+                   right: 10)
+    {
+        didSet
+        {
             self.setNeedsLayout()
         }
     }
@@ -177,7 +210,13 @@ open class MessageNode: GeneralMessengerCell {
             
             let cellOrientation = isIncomingMessage ? [ins, contentSizeLayout] : [contentSizeLayout,ins]
             
-            layoutSpecs = ASStackLayoutSpec(direction: .horizontal, spacing: 0, justifyContent: justifyLocation, alignItems: .end, children: cellOrientation)
+            
+            let alignment = self.avatarPosition.mapToStackLayoutAlignment()
+            layoutSpecs = ASStackLayoutSpec(direction: .horizontal,
+                                            spacing: 0,
+                                            justifyContent: justifyLocation,
+                                            alignItems: alignment,
+                                            children: cellOrientation)
             contentSizeLayout.style.flexShrink = 1
         } else {
             let width = constrainedSize.max.width - self.cellPadding.left - self.cellPadding.right - self.messageOffset

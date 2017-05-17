@@ -35,22 +35,38 @@ fileprivate func >= <T : Comparable>(lhs: T?, rhs: T?) -> Bool {
 }
 
 
-open class NMessengerViewController: UIViewController, UITextViewDelegate, NMessengerDelegate, UIGestureRecognizerDelegate {
-    
+open class NMessengerViewController: UIViewController
+    , UITextViewDelegate
+    , NMessengerDelegate
+    , UIGestureRecognizerDelegate
+{
     //MARK: Views
     //This is messenger view
+    //
     open var messengerView: NMessenger!
+    
     //This is input view
+    //
     open var inputBarView: InputBarView!
     
     //MARK: Private Variables
     //Bool to indicate if the keyboard is open
+    //
     open fileprivate(set) var isKeyboardIsShown : Bool = false
+    
     //NSLayoutConstraint for the input bar spacing from the bottom
+    //
     fileprivate var inputBarBottomSpacing:NSLayoutConstraint = NSLayoutConstraint()
+    
     //MARK: Public Variables
     //UIEdgeInsets for padding for each message
-    open var messagePadding: UIEdgeInsets = UIEdgeInsets(top: 5, left: 0, bottom: 5, right: 0)
+    //
+    open var messagePadding: UIEdgeInsets =
+        UIEdgeInsets(top: 5,
+                    left: 0,
+                  bottom: 5,
+                   right: 0)
+    
     /** A shared bubble configuration to use for new messages. Defaults to **SharedBubbleConfiguration***/
     open var sharedBubbleConfiguration: BubbleConfigurationProtocol = StandardBubbleConfiguration()
     
@@ -60,7 +76,8 @@ open class NMessengerViewController: UIViewController, UITextViewDelegate, NMess
      Initialiser for the controller.
      Adds observers
      */
-    public init() {
+    public init()
+    {
         super.init(nibName: nil, bundle: nil)
         self.addObservers()
     }
@@ -72,24 +89,65 @@ open class NMessengerViewController: UIViewController, UITextViewDelegate, NMess
      - parameter nibBundleOrNil: Can be NSBundle
      Adds observers
      */
-    public override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
-        super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
+    public override init(nibName nibNameOrNil: String?,
+                        bundle nibBundleOrNil: Bundle?)
+    {
+        super.init(nibName: nibNameOrNil  ,
+                    bundle: nibBundleOrNil)
+        
         self.addObservers()
     }
+    
+    
     /**
      Initialiser from xib
      Adds observers
      */
-    public required init?(coder aDecoder: NSCoder) {
+    public required init?(coder aDecoder: NSCoder)
+    {
         super.init(coder: aDecoder)
         self.addObservers()
+    }
+    
+    open func onAssetsPicked(_ assets: [PHAsset])
+    {
+        print("[WARN] NMessengerViewController.onAssetsPicked() is invoked but not overloaded")
+        print("Assets : \(assets.debugDescription)")
+    }
+    
+    open func onImagesPicked(_ images: [UIImage])
+    {
+        // legacy implementation
+        //
+        images.forEach
+        {
+            _ = self.sendImage($0, isIncomingMessage: false)
+        }
+        
+        
+        // TODO: might be different
+        // if mixed "text and image" content is allowed
+        //
+    }
+    
+    open func onSendButtonTapped(havingText currentText: String)
+    {
+        // legacy implementation
+        //
+        _ = self.sendText( currentText,
+        isIncomingMessage: false)
+        
+        // TODO: this might be not just text
+        // if mixed "text + images" content is allowed
+        //
     }
     
     /**
      Deinitialiser for controller.
      Removes observers
      */
-    deinit {
+    deinit
+    {
         self.removeObservers()
     }
     
@@ -97,13 +155,18 @@ open class NMessengerViewController: UIViewController, UITextViewDelegate, NMess
     /**
      Adds observer for UIKeyboardWillChangeFrameNotification
      */
-    fileprivate func addObservers() {
-        NotificationCenter.default.addObserver(self, selector: #selector(NMessengerViewController.keyboardNotification(_:)), name: NSNotification.Name.UIKeyboardWillChangeFrame, object: nil)
+    fileprivate func addObservers()
+    {
+        NotificationCenter.default.addObserver( self,
+                                      selector: #selector(NMessengerViewController.keyboardNotification(_:)),
+                                          name: NSNotification.Name.UIKeyboardWillChangeFrame,
+                                        object: nil)
     }
     /**
      Removes observer for UIKeyboardWillChangeFrameNotification
      */
-    fileprivate func removeObservers() {
+    fileprivate func removeObservers()
+    {
         NotificationCenter.default.removeObserver(self)
     }
     
@@ -112,29 +175,42 @@ open class NMessengerViewController: UIViewController, UITextViewDelegate, NMess
      Overriding viewDidLoad to setup the view controller
      Calls helper methods
      */
-    override open func viewDidLoad() {
+    override open func viewDidLoad()
+    {
         super.viewDidLoad()
+        
         self.view.backgroundColor = UIColor.white
+        
         //load views
-        loadMessengerView()
-        loadInputView()
-        setUpConstraintsForViews()
+        //
+        self.loadMessengerView()
+        self.loadInputView()
+        self.setUpConstraintsForViews()
+        
         //swipe down
-        let swipeDown = UISwipeGestureRecognizer(target: self, action: #selector(NMessengerViewController.respondToSwipeGesture(_:)))
+        //
+        let swipeDown =
+            UISwipeGestureRecognizer(target: self,
+                                     action: #selector(NMessengerViewController.respondToSwipeGesture(_:)))
+        
         swipeDown.direction = UISwipeGestureRecognizerDirection.down
         self.inputBarView.textInputAreaView.addGestureRecognizer(swipeDown)
     }
     
-    override open func viewDidAppear(_ animated: Bool) {
-        super.viewDidAppear(animated)
-    }
     
     //MARK: Controller LifeCycle helper methods
     /**
      Creates NMessenger view and adds it to the view
      */
-    fileprivate func loadMessengerView() {
-        self.messengerView = NMessenger(frame: CGRect(x: 0, y: 0, width: self.view.frame.size.width, height: self.view.frame.size.height - 63))
+    fileprivate func loadMessengerView()
+    {
+        let messengerViewFrame =
+            CGRect(x: 0,
+                   y: 0,
+               width: self.view.frame.size.width,
+              height: self.view.frame.size.height - 63)
+        
+        self.messengerView = NMessenger(frame: messengerViewFrame)
         messengerView.delegate = self
         self.view.addSubview(self.messengerView)
     }
@@ -192,37 +268,67 @@ open class NMessengerViewController: UIViewController, UITextViewDelegate, NMess
     /**
      Moves InputBarView up and down accoridng to the location of the keyboard
      */
-    func keyboardNotification(_ notification: Notification) {
-        if let userInfo = (notification as NSNotification).userInfo {
+    func keyboardNotification(_ notification: Notification)
+    {
+        if let userInfo = (notification as NSNotification).userInfo
+        {
             let endFrame = (userInfo[UIKeyboardFrameEndUserInfoKey] as? NSValue)?.cgRectValue
             let duration:TimeInterval = (userInfo[UIKeyboardAnimationDurationUserInfoKey] as? NSNumber)?.doubleValue ?? 0
             let animationCurveRawNSN = userInfo[UIKeyboardAnimationCurveUserInfoKey] as? NSNumber
             let animationCurveRaw = animationCurveRawNSN?.uintValue ?? UIViewAnimationOptions().rawValue
             let animationCurve:UIViewAnimationOptions = UIViewAnimationOptions(rawValue: animationCurveRaw)
-            if endFrame?.origin.y >= UIScreen.main.bounds.size.height {
+            
+            
+            let newKeyboardLocation = endFrame
+            let keyboardHeight = newKeyboardLocation?.size.height ?? 0
+            let inputBarHeight = inputBarView.frame.height
+            
+            let tabBarHeight = self.tabBarController?.tabBar.frame.size.height ?? 0
+            
+            let isKeyboardOffScreen =
+                (newKeyboardLocation?.origin.y >= UIScreen.main.bounds.size.height)
+            
+            let inputViewShiftOffsetY = keyboardHeight - tabBarHeight
+            
+            if (isKeyboardOffScreen)
+            {
                 self.inputBarBottomSpacing.constant = 0
+                /*let bottomInset*/ _ = inputBarView.frame.height
                 self.isKeyboardIsShown = false
-            } else {
-                if self.inputBarBottomSpacing.constant==0{
-                    self.inputBarBottomSpacing.constant -= endFrame?.size.height ?? 0.0
+            }
+            else
+            {
+                let isInputBarHasNoBottomSpacing = (self.inputBarBottomSpacing.constant == 0)
+                
+                if (isInputBarHasNoBottomSpacing)
+                {
+                    self.inputBarBottomSpacing.constant -= inputViewShiftOffsetY
+                    /*let bottomInset*/ _ = inputViewShiftOffsetY + inputBarHeight
                 }
                 else
                 {
                     self.inputBarBottomSpacing.constant = 0
-                    self.inputBarBottomSpacing.constant -= endFrame?.size.height ?? 0.0
+                    self.inputBarBottomSpacing.constant -= inputViewShiftOffsetY
+                    /*let bottomInset*/ _ = inputViewShiftOffsetY + inputBarHeight
                 }
                 self.isKeyboardIsShown = true
             }
             
+            let animationsBlock: () -> Swift.Void =
+            {
+                self.view.layoutIfNeeded()
+                if self.isKeyboardIsShown
+                {
+                    self.messengerView.scrollToLastMessage(animated: true)
+                }
+            }
+            
+            let noDelay: TimeInterval = 0
             UIView.animate(withDuration: duration,
-                           delay: TimeInterval(0),
-                           options: animationCurve,
-                           animations: { self.view.layoutIfNeeded()
-                            if self.isKeyboardIsShown {
-                                self.messengerView.scrollToLastMessage(animated: true)
-                            }
-            },
-                           completion: nil)
+                                  delay: noDelay,
+                                options: animationCurve,
+                             animations: animationsBlock,
+                             completion: nil)
             
         }
     }
@@ -354,8 +460,12 @@ open class NMessengerViewController: UIViewController, UITextViewDelegate, NMess
      - parameter isIncomingMessage: if message is incoming or outgoing
      - returns: the newly created message
      */
-    open func createTextMessage(_ text: String, isIncomingMessage:Bool) -> GeneralMessengerCell {
-        let textContent = TextContentNode(textMessageString: text, currentViewController: self, bubbleConfiguration: self.sharedBubbleConfiguration)
+    open func createTextMessage(_ text: String, isIncomingMessage:Bool) -> GeneralMessengerCell
+    {
+        let textContent = TextContentNode(textMessageString: text,
+                                      currentViewController: self,
+                                        bubbleConfiguration: self.sharedBubbleConfiguration)
+        
         let newMessage = MessageNode(content: textContent)
         newMessage.cellPadding = messagePadding
         newMessage.currentViewController = self
@@ -470,12 +580,22 @@ open class NMessengerViewController: UIViewController, UITextViewDelegate, NMess
      - parameter isIncomingMessage: if message is incoming or outgoing
      - returns: the newly created message
      */
-    open func createCollectionNodeMessage(_ nodes: [ASDisplayNode], numberOfRows:CGFloat, isIncomingMessage:Bool) -> GeneralMessengerCell {
-        let collectionViewContent = CollectionViewContentNode(withCustomNodes: nodes, andNumberOfRows: numberOfRows, bubbleConfiguration: self.sharedBubbleConfiguration)
+    open func createCollectionNodeMessage(
+        _ nodes: [ASDisplayNode],
+        numberOfRows:CGFloat,
+        isIncomingMessage:Bool)
+    -> GeneralMessengerCell
+    {
+        let collectionViewContent =
+            CollectionViewContentNode(
+                withCustomNodes: nodes,
+                andNumberOfRows: numberOfRows,
+                bubbleConfiguration: self.sharedBubbleConfiguration)
+        
         let newMessage = MessageNode(content: collectionViewContent)
-        newMessage.cellPadding = messagePadding
-        newMessage.currentViewController = self
-        newMessage.isIncomingMessage = isIncomingMessage
+            newMessage.cellPadding           = self.messagePadding
+            newMessage.currentViewController = self
+            newMessage.isIncomingMessage     = isIncomingMessage
         
         return newMessage
     }
@@ -487,8 +607,17 @@ open class NMessengerViewController: UIViewController, UITextViewDelegate, NMess
      - parameter isIncomingMessage: if message is incoming or outgoing
      - returns: the newly created message
      */
-    fileprivate func postCollectionView(_ nodes: [ASDisplayNode], numberOfRows:CGFloat, isIncomingMessage:Bool) -> GeneralMessengerCell {
-        let newMessage = self.createCollectionNodeMessage(nodes, numberOfRows: numberOfRows, isIncomingMessage: isIncomingMessage)
+    fileprivate func postCollectionView(
+        _ nodes: [ASDisplayNode],
+        numberOfRows:CGFloat,
+        isIncomingMessage:Bool) -> GeneralMessengerCell
+    {
+        let newMessage =
+            self.createCollectionNodeMessage(
+                nodes,
+                numberOfRows: numberOfRows,
+                isIncomingMessage: isIncomingMessage)
+        
         self.addMessageToMessenger(newMessage)
         return newMessage
     }
