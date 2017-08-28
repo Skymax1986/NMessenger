@@ -15,23 +15,6 @@ import Photos
 import AVFoundation
 
 
-
-//MARK: CameraViewController
-/**
- CameraViewDelegate protocol for NMessenger.
- Defines methods to be implemented inorder to use the CameraViewController
- */
-public protocol CameraViewDelegate : class
-{
-    /**
-     Should define behavior when a photo is selected
-     */
-    func pickedImages(_ image: [UIImage])
-    /**
-     Should define behavior cancel button is tapped
-     */
-    func cameraCancelSelection()
-}
 //MARK: SelectionType
 /**
  SelectionType enum for NMessenger.
